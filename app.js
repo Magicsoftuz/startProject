@@ -10,6 +10,7 @@ app.use(express.json());
 //   });
 // });
 
+// GET ALL
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, 'utf-8')
 );
@@ -23,7 +24,7 @@ app.get('/api/v1/tours', (req, res) => {
     },
   });
 });
-
+// ADD
 app.post('/api/v1/tours', (req, res) => {
   console.log(req.body);
   const newId = tours[tours.length - 1].id + 1;
@@ -43,7 +44,7 @@ app.post('/api/v1/tours', (req, res) => {
     }
   );
 });
-
+// GET by ID
 app.get('/api/v1/tours/:id', (req, res) => {
   const id = req.params.id * 1;
   const tour = tours.find((el) => el.id === id);
@@ -61,6 +62,7 @@ app.get('/api/v1/tours/:id', (req, res) => {
     });
   }
 });
+//Updated
 app.patch('/api/v1/tours/:id', (req, res) => {
   if (req.params.id * 1 > tours.length) {
     return res.status(404).json({
@@ -73,6 +75,20 @@ app.patch('/api/v1/tours/:id', (req, res) => {
     data: {
       tour: 'Information updated',
     },
+  });
+});
+
+// DELETE
+app.delete('/api/v1/tours/:id', (req, res) => {
+  if (req.params.id * 1 > tours.length) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'invalid id',
+    });
+  }
+  res.status(204).json({
+    status: 'success',
+    data: null,
   });
 });
 
