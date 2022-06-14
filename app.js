@@ -3,6 +3,16 @@ const fs = require('fs');
 const app = express();
 
 app.use(express.json());
+
+app.use((req, res, next) => {
+  console.log('Hello from Middelware');
+  next();
+});
+
+app.use((req, res, next) => {
+  req.time = '12.04.2022';
+  next();
+});
 // app.get('/', (req, res) => {
 //   res.status(200).json({
 //     message: 'This server is working!',
@@ -16,6 +26,7 @@ const tours = JSON.parse(
 const getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
+    getDate: req.time,
     results: tours.length,
     data: {
       tours,
