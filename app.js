@@ -99,6 +99,37 @@ const deleteTour = (req, res) => {
   });
 };
 
+const getAllUsers = (req, res) => {
+  res.status(404).json({
+    status: 'fail',
+    message: 'This route has not created yet!',
+  });
+};
+const addUser = (req, res) => {
+  res.status(404).json({
+    status: 'fail',
+    message: 'This route has not created yet!',
+  });
+};
+const updateUser = (req, res) => {
+  res.status(404).json({
+    status: 'fail',
+    message: 'This route has not created yet!',
+  });
+};
+const getUserById = (req, res) => {
+  res.status(404).json({
+    status: 'fail',
+    message: 'This route has not created yet!',
+  });
+};
+const deleteUser = (req, res) => {
+  res.status(404).json({
+    status: 'fail',
+    message: 'This route has not created yet!',
+  });
+};
+
 // app.get('/api/v1/tours', getAllTours);
 // app.post('/api/v1/tours', addTour);
 // app.get('/api/v1/tours/:id', getTourById);
@@ -111,6 +142,13 @@ app
   .get(getTourById)
   .patch(updateTour)
   .delete(deleteTour);
+
+app.route('/api/v1/users').get(getAllUsers).post(addUser);
+app
+  .route('/api/v1/users/:id')
+  .get(getUserById)
+  .patch(updateUser)
+  .delete(deleteUser);
 
 const port = 8000;
 app.listen(port, () => {
