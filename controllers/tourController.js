@@ -13,6 +13,15 @@ const checkID = (req, res, next, val) => {
   }
   next();
 };
+const checkBody = (req, res, next) => {
+  if (!req.body.name || !req.body.price) {
+    return res.status(404).json({
+      status: 'fail',
+      message: `Your info mismatched`,
+    });
+  }
+  next();
+};
 
 const getAllTours = (req, res) => {
   res.status(200).json({
@@ -77,4 +86,5 @@ module.exports = {
   updateTour,
   deleteTour,
   checkID,
+  checkBody,
 };
