@@ -8,6 +8,12 @@ const app = express();
 app.use(express.json());
 app.use(morgan('dev'));
 
+const a = 5;
+console.log(process.env);
+
+app.use(express.static('public'));
+app.use(express.static('dev-data'));
+
 app.use((req, res, next) => {
   console.log('Hello from Middelware');
   next();
