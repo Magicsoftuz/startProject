@@ -1,11 +1,21 @@
 const Tour = require('./../models/tourModel');
+const featureApi = require('./../utility/featureApi');
 
 const getAllTours = async (req, res) => {
   try {
-    const tours = await Tour.find();
+    const query = new featureApi(req.query, Tour)
+      .filter()
+      .sorting()
+      .field()
+      .pagination();
+
+    const tours = query.databaseQuery;
+    const data = await tours;
+
     res.status(200).json({
       status: 'success',
-      data: tours,
+      results: data.length,
+      data: data,
     });
   } catch (err) {
     res.status(404).json({
@@ -74,6 +84,22 @@ const deleteTour = async (req, res) => {
     });
   }
 };
+Tour.find({ price: 500 });
+
+const tourStats = async (req, res) => {
+  try {
+    const data = await Tour.aggregate([{ $match: { duration: { $gte: 10 } } }]);
+    res.status(200).json({
+      status: 'success',
+      data: data,
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err.message,
+    });
+  }
+};
 
 module.exports = {
   getAllTours,
@@ -81,4 +107,5 @@ module.exports = {
   getTourById,
   updateTour,
   deleteTour,
+  tourStats,
 };
