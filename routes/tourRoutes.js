@@ -13,7 +13,9 @@ router.use(
   },
   tourController.getAllTours
 );
+
 router.route('/stats').get(tourController.tourStats);
+router.route('/report/:year').get(tourController.tourReportYear);
 
 router.route('/').get(tourController.getAllTours).post(tourController.addTour);
 router

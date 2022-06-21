@@ -88,9 +88,24 @@ Tour.find({ price: 500 });
 
 const tourStats = async (req, res) => {
   try {
-    const data = await Tour.aggregate([{ $match: { duration: { $gte: 10 } } }]);
+    const data = await Tour.aggregate([
+      { $match: { ratingsAverage: { $gte: 4.5 } } },
+      {
+        $group: {
+          _id: { $toUpper: '$difficulty' },
+          numberTours: { $sum: 1 },
+          urtachaNarx: { $avg: '$price' },
+          engArzonNarx: { $min: '$price' },
+          engQimmatNarx: { $max: '$price' },
+          urtachaReyting: { $avg: '$ratingsAverage' },
+        },
+      },
+      { $sort: { urtachaNarx: -1 } },
+      { $project: { _id: 0 } },
+    ]);
     res.status(200).json({
       status: 'success',
+      results: data.length,
       data: data,
     });
   } catch (err) {
@@ -101,6 +116,53 @@ const tourStats = async (req, res) => {
   }
 };
 
+// Yilni tanlay (2021)
+//
+
+const tourReportYear = async (req, res) => {
+  try {
+    const data = await Tour.aggregate([
+      {
+        $unwind: '$startDates',
+      },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(`${req.params.year}-01-01`),
+            $lte: new Date(`${req.params.year}-12-31`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: '$startDates' },
+          tourlarSoni: { $sum: 1 },
+          tourNomi: { $push: '$name' },
+        },
+      },
+      { $addFields: { qaysiOyligi: '$_id' } },
+      { $project: { _id: 0 } },
+      { $sort: { tourlarSoni: -1 } },
+      { $limit: 2 },
+    ]);
+    res.status(200).json({
+      status: 'success',
+      results: data.length,
+      data: data,
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err.message,
+    });
+  }
+};
+const getOneField = async (req, res) => {
+  try {
+    const data = await Tour.aggregate([{ $match: {} }]);
+  } catch (err) {}
+};
+
 module.exports = {
   getAllTours,
   addTour,
@@ -108,4 +170,5 @@ module.exports = {
   updateTour,
   deleteTour,
   tourStats,
+  tourReportYear,
 };
