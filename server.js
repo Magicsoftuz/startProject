@@ -1,6 +1,7 @@
 const dotenv = require('dotenv');
 dotenv.config({ path: './config.env' });
 const app = require('./app');
+
 const mongoose = require('mongoose');
 
 // Unhandeled Rejection
@@ -33,4 +34,5 @@ mongoose
 
 app.listen(+process.env.PORT, process.env.SERVER_URL, () => {
   console.log(`Server running on port...`);
+
 });
