@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
     required: [true, 'You must enter tour email!'],
     unique: [true, 'Your email have already used!'],
     lowercase: true,
-    validate: [validator.email, 'Please provide a valid email'],
+    validate: [validator.isEmail, 'Please provide a valid email'],
   },
   photo: {
     type: String,
@@ -26,7 +26,6 @@ const userSchema = new mongoose.Schema({
   passwordConfirm: {
     type: String,
     required: [true, 'You must enter confirm password!'],
-    rue,
   },
 });
 
