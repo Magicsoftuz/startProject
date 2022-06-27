@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+
 const tourSchema = new mongoose.Schema(
   {
     name: {
@@ -114,3 +115,4 @@ module.exports = Tour;
 // Data Validation: Custom Validators
 
 // Handling unhandled Routes (yo'q route larni ushlab qolish)
+
