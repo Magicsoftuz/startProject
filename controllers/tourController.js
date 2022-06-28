@@ -20,6 +20,7 @@ const getAllTours = catchAsyncError(async (req, res) => {
   });
 });
 
+// Add Tour
 const addTour = catchAsyncError(async (req, res) => {
   const data = req.body;
   const tour = await Tour.create(data);
@@ -28,6 +29,8 @@ const addTour = catchAsyncError(async (req, res) => {
     data: tour,
   });
 });
+
+// Get Tour by Id
 const getTourById = catchAsyncError(async (req, res, next) => {
   const tour = await Tour.findById(req.params.id);
 
@@ -40,6 +43,8 @@ const getTourById = catchAsyncError(async (req, res, next) => {
     data: tour,
   });
 });
+
+// Update Tour
 const updateTour = catchAsyncError(async (req, res, next) => {
   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -52,12 +57,15 @@ const updateTour = catchAsyncError(async (req, res, next) => {
     data: tour,
   });
 });
+
+// Delete Tour
 const deleteTour = catchAsyncError(async (req, res, next) => {
   const tour = await Tour.findByIdAndDelete(req.params.id);
   if (!tour) {
     return next(new AppError('No tour found with that ID', 404));
   }
-  res.status(204).json({
+
+  res.status(200).json({
     status: 'success',
     data: tour,
   });
