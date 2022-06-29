@@ -82,12 +82,9 @@ const protect = catchErrorAsync(async (req, res, next) => {
     return next(new AppError('Siz tizimga kirishingiz shart!'));
   }
   // 2) Token ni tekshirish Serverniki bilan clientnikini solishtirish
-
-  console.log(jwt.verify(token, process.env.JWT_SECRET));
-
   const tekshir = jwt.verify(token, process.env.JWT_SECRET);
 
-  if (!tekshir) {
+  if (!(await tekshir)) {
     return next(
       new AppError('Bunday token mavjud emas. Iltimos qayta tizimga kiring!')
     );
