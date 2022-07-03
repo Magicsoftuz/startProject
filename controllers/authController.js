@@ -221,6 +221,45 @@ const resetPassword = catchErrorAsync(async (req, res, next) => {
   next();
 });
 
+const updatePassword = catchErrorAsync(async (req, res, next) => {
+  // 1) Get user info or model
+
+  if (req.body.password === req.body.newPassword) {
+    return next(
+      new AppError('Yangi password eskisi bilan birxil bulmasligi kerak', 401)
+    );
+  }
+
+  const user = await User.findById(req.user.id).select('+password');
+  if (!user) {
+    return next(
+      new AppError(
+        'Malumotlar bazidan topilmadingiz, iltimos qayta tizimga kiring',
+        401
+      )
+    );
+  }
+  // 2) check password posted
+
+  if (!(await bcrypt.compare(req.body.password, user.password))) {
+    return next(new AppError('Eski passwordni notugri kiritdingiz', 401));
+  }
+  // 3) update password
+  user.password = req.body.newPassword;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+
+  // 4) send JWT token
+
+  const token = createToken(user._id);
+
+  res.status(200).json({
+    status: 'success',
+    token: token,
+    message: 'Your password has been updated!',
+  });
+});
+
 module.exports = {
   signup,
   login,
@@ -228,4 +267,5 @@ module.exports = {
   role,
   forgotPassword,
   resetPassword,
+  updatePassword,
 };
