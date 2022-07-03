@@ -7,12 +7,22 @@ const AppError = require('./utility/appError');
 const ErrorController = require('./controllers/errorController');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const sanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const hpp = require('hpp');
 
 const app = express();
 
 app.use(helmet());
 
 app.use(express.json({ limit: '10kb' }));
+
+app.use(sanitize());
+
+app.use(xss());
+
+app.use(hpp());
+
 app.use(express.static(`${__dirname}/public`));
 
 app.use(morgan('dev'));
