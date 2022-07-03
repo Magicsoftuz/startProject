@@ -14,8 +14,12 @@ router
   .post(authController.protect, authController.updatePassword);
 
 router
-  .route('/updateUser')
-  .patch(authController.protect, userController.updateUser);
+  .route('/updateMe')
+  .patch(authController.protect, userController.updateMe);
+
+router
+  .route('/deleteMe')
+  .patch(authController.protect, userController.deleteMe);
 
 router
   .route('/')

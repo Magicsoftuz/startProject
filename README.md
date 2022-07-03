@@ -3,6 +3,7 @@
 You must add config.env in the main directory
 
 config.env Example:
+
 ```node
 PASSWORD=root123456
 LOGIN=root

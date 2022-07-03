@@ -16,7 +16,8 @@ const addUser = (req, res) => {
     message: 'This route has not created yet!',
   });
 };
-const updateUser = catchErrorAsync(async (req, res, next) => {
+
+const updateMe = catchErrorAsync(async (req, res, next) => {
   //1) user password not changed
 
   if (req.body.password || req.body.passwordConfirm) {
@@ -46,6 +47,19 @@ const updateUser = catchErrorAsync(async (req, res, next) => {
     data: userUpdateInfo,
   });
 });
+
+const updateUser = (req, res, next) => {};
+
+const deleteMe = catchErrorAsync(async (req, res, next) => {
+  //1)User update Active schema
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+
+  res.status(200).json({
+    status: 'success',
+    data: null,
+  });
+});
+
 const getUserById = (req, res) => {
   res.status(404).json({
     status: 'fail',
@@ -60,4 +74,12 @@ const deleteUser = catchErrorAsync(async (req, res, next) => {
   });
 });
 
-module.exports = { getAllUsers, addUser, getUserById, updateUser, deleteUser };
+module.exports = {
+  getAllUsers,
+  addUser,
+  getUserById,
+  updateMe,
+  deleteUser,
+  deleteMe,
+  updateUser,
+};
