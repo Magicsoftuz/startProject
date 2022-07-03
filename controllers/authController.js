@@ -3,6 +3,8 @@ const catchErrorAsync = require('../utility/catchAsync');
 const jwt = require('jsonwebtoken');
 const AppError = require('../utility/appError');
 const bcrypt = require('bcryptjs');
+const mail = require('../utility/mail');
+const crypto = require('crypto');
 
 const createToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -17,6 +19,7 @@ const signup = catchErrorAsync(async (req, res, next) => {
     password: req.body.password,
     photo: req.body.photo,
     passwordConfirm: req.body.passwordConfirm,
+    passwordChangedDate: req.body.passwordChangedDate,
   });
 
   const token = createToken(newUser._id);
@@ -38,7 +41,7 @@ const login = catchErrorAsync(async (req, res, next) => {
   }
 
   // 2) Shunaqa odam bormi yuqmi shuni tekshirish
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select('+password');
   if (!user) {
     return next(
       new AppError('Bunday user mavjud emas. Iltimos royxatdan uting!', 404)
@@ -82,17 +85,147 @@ const protect = catchErrorAsync(async (req, res, next) => {
     return next(new AppError('Siz tizimga kirishingiz shart!'));
   }
   // 2) Token ni tekshirish Serverniki bilan clientnikini solishtirish
-  const tekshir = jwt.verify(token, process.env.JWT_SECRET);
 
-  if (!(await tekshir)) {
+  const tokencha = jwt.verify(token, process.env.JWT_SECRET);
+
+  console.log(tokencha);
+  // 3) Token ichidan idni olib databasedagi userni topamiz.
+  const user = await User.findById(tokencha.id);
+
+  if (!user) {
     return next(
-      new AppError('Bunday token mavjud emas. Iltimos qayta tizimga kiring!')
+      new AppError(
+        'Bunday user mavjud emas. Iltimos tizimga qayta kiring!',
+        401
+      )
     );
   }
 
-  // 3) Token ichidan idni olib databasedagi userni topamiz.
+  // 4) Agar parol uzgargan bulsa tokeni amal qilmasligini tekshirish
+  if (user.passwordChangedDate) {
+    console.log(user.passwordChangedDate.getTime() / 1000);
+    console.log(tokencha.iat);
+    if (user.passwordChangedDate.getTime() / 1000 > tokencha.iat) {
+      return next(
+        new AppError(
+          'Sizning tokeningiz yaroqsiz! Iltimos qayta tizimga kiring!',
+          401
+        )
+      );
+    }
+  }
+
+  req.user = user;
+  next();
+});
+
+const role = (roles) => {
+  return catchErrorAsync(async (req, res, next) => {
+    // 1) User ni roleni olamiz databasedan, tekshiramiz
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('Siz bu amaliyotni bajarish huquqiga ega emassiz!', 401)
+      );
+    }
+    next();
+  });
+};
+
+const forgotPassword = catchErrorAsync(async (req, res, next) => {
+  // 1) Email bor yuqligini tekshirish
+  if (!req.body.email) {
+    return next(
+      new AppError('Emailni kiritishingiz Shart! Iltimos Emailni kiriting!')
+    );
+  }
+  // 2) user email orqali database dan qidirish
+  const user = await User.findOne({ email: req.body.email });
+
+  if (!user) {
+    return next(
+      new AppError('Bunday foydalanuvchi malumotlar bazasida mavjud emas!', 404)
+    );
+  }
+
+  // 3) ResetToken yaratish
+
+  const token = user.hashTokenMethod();
+  await user.save({ validateBeforeSave: false });
+
+  // 4) Email ga junatish resetToken ni
+
+  const resetLink = `${req.protocol}://${req.get(
+    'host'
+  )}/api/v1/users/resetPassword/${token}`;
+
+  const subject = 'Reset password qilish uchun link';
+  const html = `<h1>Siz passwordni reset qilish uchun quydagi tugamani bosing</h1> <a style="color:red; background-color: white" href='${resetLink}'>Reset Password</a>`;
+  const to = req.body.email;
+
+  await mail({ subject, html, to });
+
+  res.status(200).json({
+    status: 'Success',
+    message: 'Your token has been sent to Email',
+  });
 
   next();
 });
 
-module.exports = { signup, login, protect };
+const resetPassword = catchErrorAsync(async (req, res, next) => {
+  // 1) Token olamiz
+  const token = req.params.token;
+  const hashToken = crypto.createHash('sha256').update(token).digest('hex');
+
+  // 2) Token tekshiramiz -> tugri notugri ekanligi va vaqt utib ketmaganligi
+  const user = await User.findOne({
+    resetTokenHash: hashToken,
+    resetTokenVaqti: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(
+      new AppError(
+        'Tokenda xatolik mavjud. Iltimos qayta passwordni unutdim qiling!',
+        404
+      )
+    );
+  }
+
+  // 3) Yangi parol ni saqlaymiz va yangi parolni vaqtni ham saqlaymiz
+  if (!req.body.password || !req.body.passwordConfirm) {
+    return next(new AppError('Siz parolni kiritishingiz shart!', 404));
+  }
+
+  if (!(req.body.password === req.body.passwordConfirm)) {
+    return next(new AppError('Kiritilgan parollar bir biriga mos emas!', 404));
+  }
+
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  user.passwordChangedDate = Date.now();
+
+  user.resetTokenHash = undefined;
+  user.resetTokenVaqti = undefined;
+
+  await user.save();
+
+  // 4) JWT yuboramiz
+  const tokenJWT = createToken(user._id);
+
+  res.status(200).json({
+    status: 'success',
+    token: tokenJWT,
+    message: 'Password yangilandi',
+  });
+  next();
+});
+
+module.exports = {
+  signup,
+  login,
+  protect,
+  role,
+  forgotPassword,
+  resetPassword,
+};

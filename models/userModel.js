@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const crypto = require('crypto');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 
@@ -35,6 +36,7 @@ const userSchema = new mongoose.Schema({
       validator.isStrongPassword,
       'Siz kuchliroq parolni kiritishingiz kerak',
     ],
+    select: false,
   },
   passwordConfirm: {
     type: String,
@@ -46,6 +48,12 @@ const userSchema = new mongoose.Schema({
       message: 'Siz bir xil password kiriting',
     },
   },
+  passwordChangedDate: {
+    type: Date,
+    default: null,
+  },
+  resetTokenHash: String,
+  resetTokenVaqti: Date,
 });
 
 userSchema.pre('save', async function (next) {
@@ -57,6 +65,18 @@ userSchema.pre('save', async function (next) {
   this.passwordConfirm = undefined;
   next();
 });
+
+userSchema.methods.hashTokenMethod = function () {
+  const token = crypto.randomBytes(32).toString('hex');
+
+  const hashToken = crypto.createHash('sha256').update(token).digest('hex');
+
+  this.resetTokenHash = hashToken;
+
+  this.resetTokenVaqti = Date.now() + 10 * 60 * 1000;
+
+  return token;
+};
 
 const User = mongoose.model('users', userSchema);
 
