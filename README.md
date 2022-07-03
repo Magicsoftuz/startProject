@@ -3,7 +3,7 @@
 You must add config.env in the main directory
 
 config.env Example:
-
+```node
 PASSWORD=root123456
 LOGIN=root
 DATABASE=mongodb+srv://<username>:<password>@clustermironshoh.rudaqat.mongodb.net/MagicTour?retryWrites=true&w=majority
@@ -16,4 +16,4 @@ EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=465
 EMAIL_USER=Your email login
 EMAIL_PASS=your email password
-
+```
