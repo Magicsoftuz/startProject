@@ -5,6 +5,7 @@ const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const AppError = require('./utility/appError');
 const ErrorController = require('./controllers/errorController');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 app.use(express.json());
@@ -24,6 +25,15 @@ app.use((req, res, next) => {
   req.time = '12.04.2022';
   next();
 });
+
+const limit = rateLimit({
+  max: 10,
+  windowMs: 1 * 60 * 60 * 1000,
+  message: 'Too many requests from this IP, Please try again later',
+});
+
+app.use('/api', limit);
+
 // app.get('/', (req, res) => {
 //   res.status(200).json({
 //     message: 'This server is working!',
