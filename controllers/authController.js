@@ -12,6 +12,21 @@ const createToken = (id) => {
   });
 };
 
+const cookieOptions = {
+  expires: new Date(
+    Date.now() + process.env.JWT_COOKIE_EXPRIRES_IN * 24 * 60 * 60 * 1000
+  ),
+  httpOnly: true,
+};
+
+if (process.env.NODE_ENV === 'PRODUCTION') {
+  cookieOptions.secure = true;
+}
+
+const saveTokenCookie = (res, token) => {
+  res.cookie('jwt', token, cookieOptions);
+};
+
 const signup = catchErrorAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -23,7 +38,7 @@ const signup = catchErrorAsync(async (req, res, next) => {
   });
 
   const token = createToken(newUser._id);
-
+  saveTokenCookie(res, token);
   res.status(200).json({
     status: 'success',
     token: token,
@@ -64,7 +79,7 @@ const login = catchErrorAsync(async (req, res, next) => {
   }
   // 4) JWT token yasab berish
   const token = createToken(user._id);
-
+  saveTokenCookie(res, token);
   // 5) Response qaytarish
   res.status(200).json({
     status: 'success',
@@ -212,7 +227,7 @@ const resetPassword = catchErrorAsync(async (req, res, next) => {
 
   // 4) JWT yuboramiz
   const tokenJWT = createToken(user._id);
-
+  saveTokenCookie(res, tokenJWT);
   res.status(200).json({
     status: 'success',
     token: tokenJWT,
@@ -252,7 +267,7 @@ const updatePassword = catchErrorAsync(async (req, res, next) => {
   // 4) send JWT token
 
   const token = createToken(user._id);
-
+  saveTokenCookie(res, tokenJWT);
   res.status(200).json({
     status: 'success',
     token: token,
