@@ -14,6 +14,10 @@ router
   .post(authController.protect, authController.updatePassword);
 
 router
+  .route('/updateUser')
+  .patch(authController.protect, userController.updateUser);
+
+router
   .route('/')
   .get(authController.protect, userController.getAllUsers)
   .post(authController.protect, userController.addUser);
