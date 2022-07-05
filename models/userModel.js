@@ -54,6 +54,12 @@ const userSchema = new mongoose.Schema({
   },
   resetTokenHash: String,
   resetTokenVaqti: Date,
+
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
 
 userSchema.pre('save', async function (next) {
@@ -63,6 +69,11 @@ userSchema.pre('save', async function (next) {
   const hashPassword = await bcrypt.hash(this.password, 12);
   this.password = hashPassword;
   this.passwordConfirm = undefined;
+  next();
+});
+
+userSchema.pre(/^find/, async function (next) {
+  await this.find({ active: { $ne: false } });
   next();
 });
 

@@ -150,6 +150,7 @@ const forgotPassword = catchErrorAsync(async (req, res, next) => {
   // 3) ResetToken yaratish
 
   const token = user.hashTokenMethod();
+
   await user.save({ validateBeforeSave: false });
 
   // 4) Email ga junatish resetToken ni
@@ -228,4 +229,5 @@ module.exports = {
   role,
   forgotPassword,
   resetPassword,
+  createToken,
 };
