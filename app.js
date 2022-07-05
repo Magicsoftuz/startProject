@@ -10,6 +10,10 @@ const app = express();
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
 
+app.use('/api', function (req, res, next) {
+  res.cookie('jwt', res.headers);
+});
+
 app.use(morgan('dev'));
 
 app.use(express.static('public'));

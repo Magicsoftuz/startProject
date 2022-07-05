@@ -25,12 +25,19 @@ const updateUser = (req, res) => {
     message: 'This route has not created yet!',
   });
 };
-const getUserById = (req, res) => {
-  res.status(404).json({
-    status: 'fail',
-    message: 'This route has not created yet!',
+const getUserById = catchErrorAsync(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) {
+    return next(new AppError('Bunday user mavjud emas!', 404));
+  }
+
+  res.status(200).json({
+    status: 'Success',
+    data: user,
   });
-};
+  next();
+});
 const deleteUser = catchErrorAsync(async (req, res, next) => {
   await User.findByIdAndDelete(req.params.id);
   res.status(200).json({
