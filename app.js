@@ -5,14 +5,31 @@ const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const AppError = require('./utility/appError');
 const ErrorController = require('./controllers/errorController');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const sanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const hpp = require('hpp');
 
 const app = express();
-app.use(express.json());
-app.use(express.static(`${__dirname}/public`));
 
-app.use('/api', function (req, res, next) {
-  res.cookie('jwt', res.headers);
-});
+app.use(express.json({ limit: '10kb' })); // req ulchami ga limit quyish
+
+app.use(sanitize()); // req body ni tekshiradi masalan $ simovali bilan
+app.use(xss()); // Html ichiga virus tiqib yubormoqchi bulsa ushlab qoladi
+
+const limiter = rateLimit({
+  max: 10,
+  windowMs: 1 * 60 * 1000,
+  message: 'Siz kup surov berib yubordingiz!',
+}); // requestlar sonini sanaydi va cheklaydi
+
+app.use('/api', limiter);
+
+app.use(helmet()); // Headers ni sekuritysini kuchaytiradi
+app.use(hpp()); // URL xatolarni ushlaydi
+
+app.use(express.static(`${__dirname}/public`));
 
 app.use(morgan('dev'));
 
@@ -23,23 +40,6 @@ app.use((req, res, next) => {
   console.log('Hello from Middelware');
   next();
 });
-
-app.use((req, res, next) => {
-  req.time = '12.04.2022';
-  next();
-});
-// app.get('/', (req, res) => {
-//   res.status(200).json({
-//     message: 'This server is working!',
-//     data: 'Bu yerda json chiqishi kerak edi',
-//   });
-// });
-
-// app.get('/api/v1/tours', getAllTours);
-// app.post('/api/v1/tours', addTour);
-// app.get('/api/v1/tours/:id', getTourById);
-// app.patch('/api/v1/tours/:id', updateTour);
-// app.delete('/api/v1/tours/:id', deleteTour);
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);

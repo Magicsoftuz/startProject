@@ -12,6 +12,14 @@ const createToken = (id) => {
   });
 };
 
+const saveTokenCookie = (token, res, req) => {
+  res.cookie('jwt', token, {
+    maxAge: process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    secure: req.protocol === 'https' ? true : false,
+  });
+};
+
 const signup = catchErrorAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -23,6 +31,8 @@ const signup = catchErrorAsync(async (req, res, next) => {
   });
 
   const token = createToken(newUser._id);
+
+  saveTokenCookie(token, res, req);
 
   res.status(200).json({
     status: 'success',
@@ -41,7 +51,7 @@ const login = catchErrorAsync(async (req, res, next) => {
   }
 
   // 2) Shunaqa odam bormi yuqmi shuni tekshirish
-  const user = await User.findOne({ email }).select('+password');
+  const user = await User.findOne({ email: { $gte: 0 } }).select('+password');
   if (!user) {
     return next(
       new AppError('Bunday user mavjud emas. Iltimos royxatdan uting!', 404)
@@ -65,6 +75,7 @@ const login = catchErrorAsync(async (req, res, next) => {
   // 4) JWT token yasab berish
   const token = createToken(user._id);
 
+  saveTokenCookie(token, res, req);
   // 5) Response qaytarish
   res.status(200).json({
     status: 'success',
@@ -213,6 +224,8 @@ const resetPassword = catchErrorAsync(async (req, res, next) => {
 
   // 4) JWT yuboramiz
   const tokenJWT = createToken(user._id);
+
+  saveTokenCookie(token, res, req);
 
   res.status(200).json({
     status: 'success',
