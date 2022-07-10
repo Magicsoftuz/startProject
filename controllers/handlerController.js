@@ -76,8 +76,11 @@ const getAll = (Model) => {
       .pagination();
 
     const doc = query.databaseQuery;
-    const data = await doc.find(filter);
 
+    // Indexes
+    // const data = await doc.find(filter).explain();
+
+    const data = await doc.find(filter);
     res.status(200).json({
       status: 'success',
       results: data.length,
