@@ -3,6 +3,11 @@ const catchErrorAsync = require('../utility/catchAsync');
 const FeatureAPI = require('../utility/featureApi');
 
 const getAllReview = catchErrorAsync(async (req, res, next) => {
+  let filter = {};
+  if (req.params.tourId) {
+    filter = { tour: req.params.tourId };
+  }
+
   const query = new FeatureAPI(req.query, Review)
     .filter()
     .sorting()
@@ -10,7 +15,7 @@ const getAllReview = catchErrorAsync(async (req, res, next) => {
     .pagination();
 
   const review = query.databaseQuery;
-  const data = await review;
+  const data = await review.find(filter);
 
   res.status(200).json({
     status: 'success',
