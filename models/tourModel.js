@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-
 const tourSchema = new mongoose.Schema(
   {
     name: {
@@ -70,6 +69,28 @@ const tourSchema = new mongoose.Schema(
       type: Date,
       default: Date.now(),
     },
+    startLocation: {
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        day: Number,
+        description: String,
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -115,4 +136,3 @@ module.exports = Tour;
 // Data Validation: Custom Validators
 
 // Handling unhandled Routes (yo'q route larni ushlab qolish)
-
