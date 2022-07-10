@@ -17,16 +17,23 @@ const reviewSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
-  tourId: {
+  tour: {
     type: mongoose.Schema.ObjectId,
     ref: 'tours',
     required: [true, 'Review must belong to any tour'],
   },
-  userId: {
+  user: {
     type: mongoose.Schema.ObjectId,
     ref: 'users',
     required: [true, 'Review must belong to any user'],
   },
+});
+
+reviewSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'user tour',
+  });
+  next();
 });
 
 const Review = mongoose.model('reviews', reviewSchema);
