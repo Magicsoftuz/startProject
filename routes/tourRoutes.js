@@ -39,7 +39,7 @@ router
   .get(tourController.getAllTours)
   .post(
     authController.protect,
-    authController.role('admin,team-lead'),
+    authController.role(['admin', 'team-lead']),
     tourController.addTour
   );
 router
@@ -47,12 +47,12 @@ router
   .get(tourController.getTourById)
   .patch(
     authController.protect,
-    authController.role('admin, team-lead'),
+    authController.role(['admin', 'team-lead']),
     tourController.updateTour
   )
   .delete(
     authController.protect,
-    authController.role('admin, team-lead'),
+    authController.role(['admin', 'team-lead']),
     tourController.deleteTour
   );
 

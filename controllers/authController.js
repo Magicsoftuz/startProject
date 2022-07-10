@@ -51,7 +51,7 @@ const login = catchErrorAsync(async (req, res, next) => {
   }
 
   // 2) Shunaqa odam bormi yuqmi shuni tekshirish
-  const user = await User.findOne({ email: { $gte: 0 } }).select('+password');
+  const user = await User.findOne({ email: email }).select('+password');
   if (!user) {
     return next(
       new AppError('Bunday user mavjud emas. Iltimos royxatdan uting!', 404)

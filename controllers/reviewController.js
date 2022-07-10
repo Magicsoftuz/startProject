@@ -1,68 +1,28 @@
 const Review = require('../models/reviewModel');
-const catchErrorAsync = require('../utility/catchAsync');
-const FeatureAPI = require('../utility/featureApi');
 
-const getAllReview = catchErrorAsync(async (req, res, next) => {
-  let filter = {};
-  if (req.params.tourId) {
-    filter = { tour: req.params.tourId };
-  }
+const {
+  deleteOne,
+  updateOne,
+  addOne,
+  getOne,
+  getAll,
+} = require('./handlerController');
 
-  const query = new FeatureAPI(req.query, Review)
-    .filter()
-    .sorting()
-    .field()
-    .pagination();
+const getAllReview = getAll(Review);
+const getReviewById = getOne(Review);
+const addReview = addOne(Review);
+const updateReview = updateOne(Review);
+const deleteReview = deleteOne(Review);
 
-  const review = query.databaseQuery;
-  const data = await review.find(filter);
-
-  res.status(200).json({
-    status: 'success',
-    data: data,
-  });
-});
-
-const getReviewById = catchErrorAsync(async (req, res, next) => {
-  const review = await Review.findById(req.params.id);
-
-  res.status(200).json({
-    status: 'success',
-    data: review,
-  });
-});
-
-const addReview = catchErrorAsync(async (req, res, next) => {
+const setTourIdAndUserId = (req, res, next) => {
   if (!req.body.tour) {
     req.body.tour = req.params.tourId;
   }
   if (!req.body.user) {
     req.body.user = req.user.id;
   }
-  const review = await Review.create(req.body);
-  res.status(200).json({
-    status: 'success',
-    data: review,
-  });
-});
-
-const updateReview = catchErrorAsync(async (req, res, next) => {
-  const review = await Review.findByIdAndUpdate(req.params.id, req.body);
-
-  res.status(201).json({
-    status: 'success',
-    data: review,
-  });
-});
-
-const deleteReview = catchErrorAsync(async (req, res, next) => {
-  const review = await Review.findByIdAndDelete(req.params.id);
-
-  res.status(204).json({
-    status: 'success',
-    data: review,
-  });
-});
+  next();
+};
 
 module.exports = {
   getAllReview,
@@ -70,4 +30,5 @@ module.exports = {
   addReview,
   updateReview,
   deleteReview,
+  setTourIdAndUserId,
 };
