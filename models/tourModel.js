@@ -109,6 +109,13 @@ tourSchema.virtual('haftaDavomEtish').get(function () {
   return this.duration / 7;
 });
 
+// Virtual Populate
+tourSchema.virtual('reviews', {
+  ref: 'reviews',
+  foreignField: 'tour',
+  localField: '_id',
+});
+
 tourSchema.pre('save', function (next) {
   this.name = this.name + 1;
   this.startTime = Date.now();

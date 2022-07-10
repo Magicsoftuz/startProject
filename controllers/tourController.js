@@ -36,7 +36,7 @@ const addTour = catchAsyncError(async (req, res) => {
 
 // Get Tour by Id
 const getTourById = catchAsyncError(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id);
+  const tour = await Tour.findById(req.params.id).populate('reviews');
   // .populate({
   //   path: 'guides',
   //   select: '-__v -passwordChangedDate -role',
