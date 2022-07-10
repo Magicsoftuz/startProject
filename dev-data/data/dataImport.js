@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
 const fs = require('fs');
 const tourModel = require('./../../models/tourModel');
-const dotenv = require('dotenv');
+const userModel = require('./../../models/userModel');
+const reviewModel = require('./../../models/reviewModel');
 
+const dotenv = require('dotenv');
 dotenv.config({ path: './config.env' });
 console.log(process.env.DATABASE);
 
@@ -20,20 +22,30 @@ mongoose
     console.log(`ERROR: ${err}`);
   });
 
-const data = JSON.parse(fs.readFileSync('./dev-data/data/tours.json', 'utf-8'));
+const tour = JSON.parse(fs.readFileSync('./dev-data/data/tours.json', 'utf-8'));
+const user = JSON.parse(fs.readFileSync('./dev-data/data/users.json', 'utf-8'));
+const review = JSON.parse(
+  fs.readFileSync('./dev-data/data/reviews.json', 'utf-8')
+);
 
 const addData = async () => {
   try {
-    const add = await tourModel.create(data);
+    await tourModel.create(tour);
+    await userModel.create(user, { validateBeforeSave: false });
+    await reviewModel.create(review);
     console.log('Narmalni saqladi');
+    process.exit(0);
   } catch (err) {
     console.log('Kalla quydi: ' + err);
   }
 };
 const deleteData = async () => {
   try {
-    const deleted = await tourModel.deleteMany();
+    await tourModel.deleteMany();
+    await userModel.deleteMany();
+    await reviewModel.deleteMany();
     console.log('Top toza');
+    process.exit(0);
   } catch (err) {
     console.log('Kir');
   }

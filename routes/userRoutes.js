@@ -6,51 +6,26 @@ const router = express.Router();
 
 router.route('/signup').post(authController.signup);
 router.route('/signin').post(authController.login);
-
 router.route('/forgotpassword').post(authController.forgotPassword);
 router.route('/resetPassword/:token').post(authController.resetPassword);
-router
-  .route('/updatePassword')
-  .post(authController.protect, authController.updatePassword);
 
-router
-  .route('/updateMe')
-  .patch(authController.protect, userController.updateMe);
+// Middleware for all next route
+router.use(authController.protect);
 
-router
-  .route('/deleteMe')
-  .patch(authController.protect, userController.deleteMe);
+router.route('/updatePassword').post(authController.updatePassword);
+router.route('/updateMe').patch(userController.updateMe);
+router.route('/deleteMe').patch(userController.deleteMe);
+router.route('/updateMePassword').patch(userController.updateMePassword);
+router.route('/updateMeData').patch(userController.updateMe);
+router.route('/deleteMe').delete(userController.deleteMe);
+router.route('/getMe').get(userController.getMe, userController.getUserById);
 
-router
-  .route('/updateMePassword')
-  .patch(authController.protect, userController.updateMePassword);
-
-router
-  .route('/updateMeData')
-  .patch(authController.protect, userController.updateMe);
-
-router
-  .route('/deleteMe')
-  .delete(authController.protect, userController.deleteMe);
-
-router
-  .route('/getMe')
-  .get(
-    authController.protect,
-    userController.getMe,
-    userController.getUserById
-  );
-
-router
-  .route('/')
-  .get(authController.protect, userController.getAllUsers)
-  .post(authController.protect, userController.addUser);
+router.route('/').get(userController.getAllUsers).post(userController.addUser);
 router
   .route('/:id')
-  .get(authController.protect, userController.getUserById)
-  .patch(authController.protect, userController.updateUser)
+  .get(userController.getUserById)
+  .patch(authController.role(['admin', 'team-lead']), userController.updateUser)
   .delete(
-    authController.protect,
     authController.role(['admin', 'team-lead']),
     userController.deleteUser
   );

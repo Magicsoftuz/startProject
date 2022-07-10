@@ -6,7 +6,6 @@ const reviewRouter = require('./../routes/reviewRoutes');
 const router = express.Router();
 
 // nested route
-
 router.use('/:tourId/reviews', reviewRouter);
 
 router.use(
@@ -23,14 +22,14 @@ router
   .route('/stats')
   .get(
     authController.protect,
-    authController.role('admin'),
+    authController.role(['admin']),
     tourController.tourStats
   );
 router
   .route('/report/:year')
   .get(
     authController.protect,
-    authController.role('admin'),
+    authController.role(['admin']),
     tourController.tourReportYear
   );
 
@@ -55,17 +54,5 @@ router
     authController.role(['admin', 'team-lead']),
     tourController.deleteTour
   );
-
-// route("/:tourId/reviews") -> Add route
-// route("/:tourId/reviews/:id") -> Update
-// route("/:tourId/reviews/:id") -> One review
-
-// router
-//   .route('/:tourId/reviews')
-//   .post(
-//     authController.protect,
-//     authController.role('user'),
-//     reviewController.addReview
-//   );
 
 module.exports = router;
