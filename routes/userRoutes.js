@@ -34,6 +34,14 @@ router
   .delete(authController.protect, userController.deleteMe);
 
 router
+  .route('/getMe')
+  .get(
+    authController.protect,
+    userController.getMe,
+    userController.getUserById
+  );
+
+router
   .route('/')
   .get(authController.protect, userController.getAllUsers)
   .post(authController.protect, userController.addUser);

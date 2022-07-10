@@ -62,6 +62,11 @@ const updateMePassword = catchErrorAsync(async (req, res, next) => {
   });
 });
 
+const getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
+
 const updateMe = catchErrorAsync(async (req, res, next) => {
   // 1) Malumotlarni yangilash
 
@@ -109,4 +114,5 @@ module.exports = {
   updateMePassword,
   updateMe,
   deleteMe,
+  getMe,
 };
