@@ -20,9 +20,7 @@ mongoose
     console.log(`ERROR: ${err}`);
   });
 
-const data = JSON.parse(
-  fs.readFileSync('./dev-data/data/tours-simple.json', 'utf-8')
-);
+const data = JSON.parse(fs.readFileSync('./dev-data/data/tours.json', 'utf-8'));
 
 const addData = async () => {
   try {

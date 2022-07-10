@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const User = require('./userModel');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -69,6 +70,29 @@ const tourSchema = new mongoose.Schema(
       type: Date,
       default: Date.now(),
     },
+    startLocation: {
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        day: Number,
+        description: String,
+      },
+    ],
+    guides: Array,
   },
   {
     toJSON: { virtuals: true },
@@ -88,6 +112,14 @@ tourSchema.pre('save', function (next) {
 
 tourSchema.post('save', function (doc, next) {
   console.log(Date.now() - doc.startTime);
+  next();
+});
+
+// Xato usul
+
+tourSchema.pre('save', async function (next) {
+  const guidePromise = this.guides.map(async (id) => await User.findById(id));
+  this.guides = await Promise.all(guidePromise);
   next();
 });
 

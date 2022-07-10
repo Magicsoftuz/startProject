@@ -12,19 +12,12 @@ const createToken = (id) => {
   });
 };
 
-const cookieOptions = {
-  expires: new Date(
-    Date.now() + process.env.JWT_COOKIE_EXPRIRES_IN * 24 * 60 * 60 * 1000
-  ),
-  httpOnly: true,
-};
-
-if (process.env.NODE_ENV === 'PRODUCTION') {
-  cookieOptions.secure = true;
-}
-
-const saveTokenCookie = (res, token) => {
-  res.cookie('jwt', token, cookieOptions);
+const saveTokenCookie = (token, res, req) => {
+  res.cookie('jwt', token, {
+    maxAge: process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    secure: req.protocol === 'https' ? true : false,
+  });
 };
 
 const signup = catchErrorAsync(async (req, res, next) => {
@@ -38,7 +31,9 @@ const signup = catchErrorAsync(async (req, res, next) => {
   });
 
   const token = createToken(newUser._id);
-  saveTokenCookie(res, token);
+
+  saveTokenCookie(token, res, req);
+
   res.status(200).json({
     status: 'success',
     token: token,
@@ -56,7 +51,7 @@ const login = catchErrorAsync(async (req, res, next) => {
   }
 
   // 2) Shunaqa odam bormi yuqmi shuni tekshirish
-  const user = await User.findOne({ email }).select('+password');
+  const user = await User.findOne({ email: { $gte: 0 } }).select('+password');
   if (!user) {
     return next(
       new AppError('Bunday user mavjud emas. Iltimos royxatdan uting!', 404)
@@ -79,7 +74,8 @@ const login = catchErrorAsync(async (req, res, next) => {
   }
   // 4) JWT token yasab berish
   const token = createToken(user._id);
-  saveTokenCookie(res, token);
+
+  saveTokenCookie(token, res, req);
   // 5) Response qaytarish
   res.status(200).json({
     status: 'success',
@@ -165,6 +161,7 @@ const forgotPassword = catchErrorAsync(async (req, res, next) => {
   // 3) ResetToken yaratish
 
   const token = user.hashTokenMethod();
+
   await user.save({ validateBeforeSave: false });
 
   // 4) Email ga junatish resetToken ni
@@ -227,7 +224,9 @@ const resetPassword = catchErrorAsync(async (req, res, next) => {
 
   // 4) JWT yuboramiz
   const tokenJWT = createToken(user._id);
-  saveTokenCookie(res, tokenJWT);
+
+  saveTokenCookie(token, res, req);
+
   res.status(200).json({
     status: 'success',
     token: tokenJWT,
@@ -282,5 +281,6 @@ module.exports = {
   role,
   forgotPassword,
   resetPassword,
+  createToken,
   updatePassword,
 };
