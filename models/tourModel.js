@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const User = require('./userModel');
+// const User = require('./userModel');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -92,7 +92,12 @@ const tourSchema = new mongoose.Schema(
         description: String,
       },
     ],
-    guides: Array,
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -117,11 +122,11 @@ tourSchema.post('save', function (doc, next) {
 
 // Xato usul
 
-tourSchema.pre('save', async function (next) {
-  const guidePromise = this.guides.map(async (id) => await User.findById(id));
-  this.guides = await Promise.all(guidePromise);
-  next();
-});
+// tourSchema.pre('save', async function (next) {
+//   const guidePromise = this.guides.map(async (id) => await User.findById(id));
+//   this.guides = await Promise.all(guidePromise);
+//   next();
+// });
 
 tourSchema.pre('findOneAndDelete', function (next) {
   this.findOneAndDelete({ secretInfo: { $ne: true } });
