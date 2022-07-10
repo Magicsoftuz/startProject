@@ -95,7 +95,7 @@ const tourSchema = new mongoose.Schema(
     guides: [
       {
         type: mongoose.Schema.ObjectId,
-        ref: 'User',
+        ref: 'users',
       },
     ],
   },
@@ -130,6 +130,14 @@ tourSchema.post('save', function (doc, next) {
 
 tourSchema.pre('findOneAndDelete', function (next) {
   this.findOneAndDelete({ secretInfo: { $ne: true } });
+  next();
+});
+
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedDate -role',
+  });
   next();
 });
 
