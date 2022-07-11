@@ -66,7 +66,10 @@ app.use('/api', limit);
 // app.delete('/api/v1/tours/:id', deleteTour);
 
 app.get('/', (req, res) => {
-  res.status(200).render('base');
+  res.status(200).render('base', {
+    tour: 'The Tashkent City',
+    user: 'Plux',
+  });
 });
 
 app.use('/api/v1/tours', tourRouter);
