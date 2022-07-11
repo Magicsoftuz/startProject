@@ -99,6 +99,9 @@ const tourSchema = new mongoose.Schema(
         ref: 'users',
       },
     ],
+    slug: {
+      type: String,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -108,9 +111,6 @@ const tourSchema = new mongoose.Schema(
 
 tourSchema.virtual('haftaDavomEtish').get(function () {
   return this.duration / 7;
-});
-tourSchema.virtual('slug').get(function () {
-  return slug(this.name);
 });
 
 // Virtual Populate
@@ -127,6 +127,11 @@ tourSchema.index({ slug: 1 });
 tourSchema.pre('save', function (next) {
   this.name = this.name;
   this.startTime = Date.now();
+  next();
+});
+
+tourSchema.pre('save', function (next) {
+  this.slug = slug(this.name);
   next();
 });
 

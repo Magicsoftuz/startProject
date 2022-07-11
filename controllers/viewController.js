@@ -11,10 +11,18 @@ const getAllTours = catchErrorAsync(async (req, res) => {
   });
 });
 
-const getOneTour = (req, res) => {
+const getOneTour = catchErrorAsync(async (req, res) => {
+  const slug = req.params.slug;
+  console.log(slug);
+  const tour = await Tour.findOne({ slug: slug }).populate({
+    path: 'reviews',
+    select: 'review rating user',
+  });
+  console.log(tour);
   res.status(200).render('tour', {
     title: 'This Tashkent City',
+    tour: tour,
   });
-};
+});
 
 module.exports = { getAllTours, getOneTour };
