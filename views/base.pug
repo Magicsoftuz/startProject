@@ -1,15 +1,48 @@
 doctype html 
 html 
   head 
-    title MagicTour #{tour}
-    link(rel="stylesheet", href="css/style.css")
-    link(rel="shortcut icon", href="img/favicon.png", type="image/x-icon")
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0" )
+    link(href="https://fonts.googleapis.com/css?family=Lato:300,300i,700"
+      rel="stylesheet")
+    link(rel="stylesheet" href="css/style.css")
+    link(rel="shortcut icon" type="image/png" href="img/favicon.png")
+
+    title Natours | Exciting tours for adventurous people
   
   body 
-    // kurinadigan koment
-    //- kunirmaydigan koment
-    - const a = 5;
-    p= a*5
+    //HEADER
+    header.header
+      nav.nav.nav--tours
+        a.nav__el(href="#") All tours
 
-    h1(style="color: red")= tour
-    p= user 
+      .header__logo
+        img(src="img/logo-white.png" alt="Natours logo")
+      nav.nav.nav--user
+        a.nav__el(href="#") My  bookings
+        //- a.nav__el
+        //-   img.nav__user-img(src="img/user.jpg" alt="User photo")
+        //-   span Umid
+        button.nav__el Login
+        button.nav__el Sign up
+
+
+    // CONTENT
+    h1= tour 
+
+    // FOOTER
+    .footer 
+      .footer__logo 
+        img(src="img/logo-green.png" alt="Natours logo")
+
+      ul.footer__nav 
+        li: a(href="#") About us
+        li: a(href="#") Download apps
+        li: a(href="#") Become a guide
+        li: a(href="#") Careers
+        li: a(href="#") Contact
+      p.footer__copyright  &copy; by Umid Rustamov. All rights reserved.
+
+
+  
+  
