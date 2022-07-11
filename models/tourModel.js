@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slug = require('slug');
 // const User = require('./userModel');
 
 const tourSchema = new mongoose.Schema(
@@ -107,6 +108,9 @@ const tourSchema = new mongoose.Schema(
 
 tourSchema.virtual('haftaDavomEtish').get(function () {
   return this.duration / 7;
+});
+tourSchema.virtual('slug').get(function () {
+  return slug(this.name);
 });
 
 // Virtual Populate
