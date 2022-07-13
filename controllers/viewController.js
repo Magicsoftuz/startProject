@@ -20,7 +20,7 @@ const getOneTour = catchErrorAsync(async (req, res) => {
   });
   console.log(tour);
   res.status(200).render('tour', {
-    title: 'This Tashkent City',
+    title: tour.name,
     tour: tour,
   });
 });
