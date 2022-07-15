@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['user', 'guide', 'team-lead', 'admin'],
+    enum: ['user', 'guide', 'lead-guide', 'admin'],
     default: 'user',
   },
 
@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
   },
   passwordConfirm: {
     type: String,
-    required: [true, 'Siz passwordni kiritishingiz shart'],
+    required: [false, 'Siz passwordni kiritishingiz shart'],
     validate: {
       validator: function (val) {
         return val === this.password;

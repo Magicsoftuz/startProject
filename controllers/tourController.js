@@ -11,7 +11,15 @@ const getAllTours = catchAsyncError(async (req, res) => {
     .pagination();
 
   const tours = query.databaseQuery;
-  const data = await tours;
+  const data = await tours
+    .find()
+    .populate({
+      path: 'guides',
+      select: '-role -__v -passwordChangedDate',
+    })
+    .populate({
+      path: 'reviews',
+    });
 
   res.status(200).json({
     status: 'success',
@@ -32,7 +40,10 @@ const addTour = catchAsyncError(async (req, res) => {
 
 // Get Tour by Id
 const getTourById = catchAsyncError(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id);
+  const tour = await Tour.findById(req.params.id).populate({
+    path: 'guides',
+    select: '-role -__v -passwordChangedDate',
+  });
 
   if (!tour) {
     return next(new AppError('No tour found with that ID', 404));

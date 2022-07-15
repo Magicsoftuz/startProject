@@ -3,6 +3,38 @@ const User = require('./userModel');
 
 const tourSchema = new mongoose.Schema(
   {
+    startLocation: {
+      description: {
+        type: String,
+        required: [true, 'You must enter description!'],
+      },
+      type: {
+        type: String,
+        default: 'Point',
+      },
+      coordinates: [Number],
+      address: {
+        type: String,
+        required: [true, 'You must enter address!'],
+      },
+    },
+    locations: [
+      {
+        description: {
+          type: String,
+          required: [true, 'You must enter description!'],
+        },
+        type: {
+          type: String,
+          default: 'Point',
+        },
+        coordinates: [Number],
+        day: {
+          type: Number,
+          required: [true, 'You must enter day!'],
+        },
+      },
+    ],
     name: {
       type: String,
       required: [true, 'Name ni kirtishingiz shart'],
@@ -70,30 +102,14 @@ const tourSchema = new mongoose.Schema(
       type: Date,
       default: Date.now(),
     },
-    startLocation: {
-      type: {
-        type: String,
-        default: 'Point',
-        enum: ['Point'],
-      },
-      coordinates: [Number],
-      address: String,
-      description: String,
-    },
-    locations: [
+    guides: [
       {
-        type: {
-          type: String,
-          default: 'Point',
-          enum: ['Point'],
-        },
-        coordinates: [Number],
-        day: Number,
-        description: String,
+        type: mongoose.Schema.ObjectId,
+        ref: 'users',
       },
     ],
-    guides: Array,
   },
+
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
@@ -104,6 +120,12 @@ tourSchema.virtual('haftaDavomEtish').get(function () {
   return this.duration / 7;
 });
 
+tourSchema.virtual('reviews', {
+  ref: 'reviews',
+  localField: '_id',
+  foreignField: 'tour',
+});
+
 tourSchema.pre('save', function (next) {
   this.name = this.name + 1;
   this.startTime = Date.now();
@@ -112,14 +134,6 @@ tourSchema.pre('save', function (next) {
 
 tourSchema.post('save', function (doc, next) {
   console.log(Date.now() - doc.startTime);
-  next();
-});
-
-// Xato usul
-
-tourSchema.pre('save', async function (next) {
-  const guidePromise = this.guides.map(async (id) => await User.findById(id));
-  this.guides = await Promise.all(guidePromise);
   next();
 });
 
