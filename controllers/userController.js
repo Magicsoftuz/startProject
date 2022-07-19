@@ -3,48 +3,29 @@ const catchErrorAsync = require('../utility/catchAsync');
 const bcrypt = require('bcryptjs');
 const AppError = require('../utility/appError');
 const authController = require('./authController');
+const {
+  getAll,
+  getOne,
+  add,
+  update,
+  deleteData,
+} = require('./handlerController');
 
-const getAllUsers = catchErrorAsync(async (req, res, next) => {
-  const users = await User.find();
-  res.status(200).json({
-    status: 'success',
-    userInfo: req.user,
-    data: users,
-  });
-});
-
-const addUser = (req, res) => {
-  res.status(404).json({
-    status: 'fail',
-    message: 'This route has not created yet!',
-  });
+const getAllUsers = (req, res, next) => {
+  getAll(req, res, next, User);
 };
-const updateUser = (req, res) => {
-  res.status(404).json({
-    status: 'fail',
-    message: 'This route has not created yet!',
-  });
+const getUserById = (req, res, next) => {
+  getOne(req, res, next, User);
 };
-const getUserById = catchErrorAsync(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
-
-  if (!user) {
-    return next(new AppError('Bunday user mavjud emas!', 404));
-  }
-
-  res.status(200).json({
-    status: 'Success',
-    data: user,
-  });
-  next();
-});
-const deleteUser = catchErrorAsync(async (req, res, next) => {
-  await User.findByIdAndDelete(req.params.id);
-  res.status(200).json({
-    status: 'Success',
-    message: 'User has been deleted',
-  });
-});
+const addUser = (req, res, next) => {
+  add(req, res, next, User);
+};
+const updateUser = (req, res, next) => {
+  update(req, res, next, User);
+};
+const deleteUser = (req, res, next) => {
+  deleteData(req, res, next);
+};
 
 const updateMePassword = catchErrorAsync(async (req, res, next) => {
   // 1) Eski parolni tekshirishib kuramiz

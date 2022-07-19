@@ -2,6 +2,7 @@ const express = require('express');
 const app = require('../app');
 const tourController = require('./../controllers/tourController');
 const authController = require('./../controllers/authController');
+const reviewRoute = require('./reviewRoutes');
 
 const router = express.Router();
 
@@ -17,6 +18,8 @@ router.use(
 
 router.route('/stats').get(tourController.tourStats);
 router.route('/report/:year').get(tourController.tourReportYear);
+
+router.use('/:id/reviews', reviewRoute);
 
 router
   .route('/')
