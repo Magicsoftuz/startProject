@@ -11,10 +11,14 @@ const helmet = require('helmet');
 const sanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const path = require('path');
 
 const app = express();
 
 app.use(express.json({ limit: '10kb' })); // req ulchami ga limit quyish
+
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
 
 app.use(sanitize()); // req body ni tekshiradi masalan $ simovali bilan
 app.use(xss()); // Html ichiga virus tiqib yubormoqchi bulsa ushlab qoladi
@@ -30,16 +34,17 @@ app.use('/api', limiter);
 app.use(helmet()); // Headers ni sekuritysini kuchaytiradi
 app.use(hpp()); // URL xatolarni ushlaydi
 
-app.use(express.static(`${__dirname}/public`));
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(morgan('dev'));
-
-app.use(express.static('public'));
-app.use(express.static('dev-data'));
 
 app.use((req, res, next) => {
   console.log('Hello from Middelware');
   next();
+});
+
+app.use('/home', (req, res, next) => {
+  res.status(200).render('base');
 });
 
 app.use('/api/v1/reviews', reviewRouter);

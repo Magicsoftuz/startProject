@@ -120,6 +120,8 @@ tourSchema.virtual('haftaDavomEtish').get(function () {
   return this.duration / 7;
 });
 
+tourSchema.index('price', {});
+
 tourSchema.virtual('reviews', {
   ref: 'reviews',
   localField: '_id',

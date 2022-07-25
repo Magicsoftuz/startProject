@@ -24,15 +24,31 @@ router
 
 router
   .route('/')
-  .get(authController.protect, userController.getAllUsers)
-  .post(authController.protect, userController.addUser);
+  .get(
+    authController.protect,
+    authController.role(['admin', 'lead-guide', 'guide']),
+    userController.getAllUsers
+  )
+  .post(
+    authController.protect,
+    authController.role(['admin', 'lead-guide']),
+    userController.addUser
+  );
 router
   .route('/:id')
-  .get(authController.protect, userController.getUserById)
-  .patch(authController.protect, userController.updateUser)
+  .get(
+    authController.protect,
+    authController.role(['admin', 'lead-guide', 'guide']),
+    userController.getUserById
+  )
+  .patch(
+    authController.protect,
+    authController.role(['admin', 'lead-guide']),
+    userController.updateUser
+  )
   .delete(
     authController.protect,
-    authController.role(['admin', 'team-lead']),
+    authController.role(['admin', 'lead-guide']),
     userController.deleteUser
   );
 

@@ -48,4 +48,22 @@ const addReview = catchErrorAsync(async (req, res, next) => {
   });
 });
 
-module.exports = { addReview, getAllReviews };
+const getReviewById = (req, res, next) => {
+  getOne(req, res, next, Review, options, options2);
+};
+
+const updateReview = (req, res, next) => {
+  update(req, res, next, Review);
+};
+
+const deleteReview = (req, res, next) => {
+  deleteData(req, res, next, Review);
+};
+
+module.exports = {
+  addReview,
+  getAllReviews,
+  getReviewById,
+  updateReview,
+  deleteReview,
+};
