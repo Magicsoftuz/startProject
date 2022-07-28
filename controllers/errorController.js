@@ -6,17 +6,29 @@ module.exports = (err, req, res, next) => {
     err.message = 'Your token is not valid!';
   }
   if (process.env.NODE_ENV === 'DEVELOPMENT') {
-    res.status(err.statusCode).json({
-      status: err.status,
-      error: err,
-      message: err.message,
-      stack: err.stack,
-    });
+    if (req.originalUrl.startsWith('/api')) {
+      res.status(err.statusCode).json({
+        status: err.status,
+        error: err,
+        message: err.message,
+        stack: err.stack,
+      });
+    } else {
+      res.status(err.statusCode).render('error', {
+        msg: err,
+      });
+    }
   } else if (process.env.NODE_ENV === 'PRODUCTION') {
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message,
-    });
+    if (req.originalUrl.startsWith('/api')) {
+      res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message,
+      });
+    } else {
+      res.status(err.statusCode).render('error', {
+        msg: 'Please try again later',
+      });
+    }
   }
   next();
 };
