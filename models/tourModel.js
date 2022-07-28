@@ -136,7 +136,6 @@ tourSchema.pre('save', function (next) {
 });
 
 tourSchema.post('save', function (doc, next) {
-  console.log(Date.now() - doc.startTime);
   next();
 });
 
@@ -162,7 +161,6 @@ tourSchema.pre(/^find/, function (next) {
 });
 
 tourSchema.post('find', function (doc, next) {
-  console.log(doc);
   next();
 });
 

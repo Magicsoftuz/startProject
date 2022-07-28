@@ -12,17 +12,22 @@ const getAllTours = catchErrorAsync(async (req, res) => {
 });
 
 const getOneTour = catchErrorAsync(async (req, res) => {
-  const slug = req.params.slug;
-  console.log(slug);
-  const tour = await Tour.findOne({ slug: slug }).populate({
+  const slug = req.params.id;
+  console.log('saaalom' + slug);
+  const tour = await Tour.findOne({ _id: req.params.id }).populate({
     path: 'reviews',
     select: 'review rating user',
   });
+
   console.log(tour);
+
   res.status(200).render('tour', {
-    title: tour.name,
     tour: tour,
   });
 });
 
-module.exports = { getAllTours, getOneTour };
+const login = catchErrorAsync(async (req, res, next) => {
+  res.status(200).render('login', {});
+});
+
+module.exports = { getAllTours, getOneTour, login };

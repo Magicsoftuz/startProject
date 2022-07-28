@@ -41,6 +41,15 @@ const signup = catchErrorAsync(async (req, res, next) => {
   });
 });
 
+const logout = (req, res, next) => {
+  res.cookie('jwt', 'loggedOut', {
+    httpOnly: true,
+  });
+  res.status(200).json({
+    status: 'success',
+  });
+};
+
 const login = catchErrorAsync(async (req, res, next) => {
   // 1) Email bilan password borligini tekshirish
 
@@ -91,6 +100,8 @@ const protect = catchErrorAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
   if (!token) {
     return next(new AppError('Siz tizimga kirishingiz shart!'));
@@ -129,6 +140,42 @@ const protect = catchErrorAsync(async (req, res, next) => {
   req.user = user;
   next();
 });
+
+const isLoggedIn = async (req, res, next) => {
+  // 1) Token bor yuqligini headerdan tekshirish
+  try {
+    if (req.cookies.jwt) {
+      let token = req.cookies.jwt;
+      if (!token) {
+        return next();
+      }
+      // 2) Token ni tekshirish Serverniki bilan clientnikini solishtirish
+
+      const tokencha = jwt.verify(token, process.env.JWT_SECRET);
+
+      // 3) Token ichidan idni olib databasedagi userni topamiz.
+      const user = await User.findById(tokencha.id);
+
+      if (!user) {
+        return next();
+      }
+
+      // 4) Agar parol uzgargan bulsa tokeni amal qilmasligini tekshirish
+      if (user.passwordChangedDate) {
+        if (user.passwordChangedDate.getTime() / 1000 > tokencha.iat) {
+          return next();
+        }
+      }
+
+      res.locals.user = user;
+      return next();
+    }
+
+    next();
+  } catch (err) {
+    next();
+  }
+};
 
 const role = (roles) => {
   return catchErrorAsync(async (req, res, next) => {
@@ -283,4 +330,6 @@ module.exports = {
   resetPassword,
   createToken,
   updatePassword,
+  isLoggedIn,
+  logout,
 };

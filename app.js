@@ -12,6 +12,7 @@ const helmet = require('helmet');
 const sanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(helmet());
 
 app.use(express.json({ limit: '10kb' }));
+app.use(cookieParser());
 
 app.use(sanitize());
 
@@ -36,7 +38,7 @@ app.use(express.static('public'));
 app.use(express.static('dev-data'));
 
 app.use((req, res, next) => {
-  console.log('Hello from Middelware');
+  console.log(req.cookies);
   next();
 });
 

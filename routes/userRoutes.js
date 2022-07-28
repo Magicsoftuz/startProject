@@ -19,6 +19,7 @@ router.route('/updateMePassword').patch(userController.updateMePassword);
 router.route('/updateMeData').patch(userController.updateMe);
 router.route('/deleteMe').delete(userController.deleteMe);
 router.route('/getMe').get(userController.getMe, userController.getUserById);
+router.route('/logout').post(authController.logout);
 
 router.route('/').get(userController.getAllUsers).post(userController.addUser);
 router
