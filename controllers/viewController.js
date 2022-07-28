@@ -1,3 +1,4 @@
+const User = require('../models/userModel');
 const AppError = require('../utility/appError');
 const catchErrorAsync = require('../utility/catchAsync');
 const Tour = require('./../models/tourModel');
@@ -43,4 +44,24 @@ const account = catchErrorAsync(async (req, res, next) => {
   res.status(200).render('account', {});
 });
 
-module.exports = { getAllTours, getOneTour, login, account };
+const submitData = catchErrorAsync(async (req, res, next) => {
+  console.log(req.body.name);
+  const updateData = await User.findByIdAndUpdate(
+    req.user.id,
+    {
+      name: req.body.name,
+      email: req.body.email,
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  res.status(200).render('account', {
+    msg: 'Your data has been updated',
+    user: updateData,
+  });
+});
+
+module.exports = { getAllTours, getOneTour, login, account, submitData };
