@@ -39,4 +39,8 @@ const login = catchErrorAsync(async (req, res, next) => {
   res.status(200).render('login', {});
 });
 
-module.exports = { getAllTours, getOneTour, login };
+const account = catchErrorAsync(async (req, res, next) => {
+  res.status(200).render('account', {});
+});
+
+module.exports = { getAllTours, getOneTour, login, account };

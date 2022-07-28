@@ -138,11 +138,11 @@ const protect = catchErrorAsync(async (req, res, next) => {
   }
 
   req.user = user;
+  res.locals.user = user;
   next();
 });
 
 const isLoggedIn = async (req, res, next) => {
-  // 1) Token bor yuqligini headerdan tekshirish
   try {
     if (req.cookies.jwt) {
       let token = req.cookies.jwt;
@@ -155,7 +155,6 @@ const isLoggedIn = async (req, res, next) => {
 
       // 3) Token ichidan idni olib databasedagi userni topamiz.
       const user = await User.findById(tokencha.id);
-
       if (!user) {
         return next();
       }
@@ -168,12 +167,13 @@ const isLoggedIn = async (req, res, next) => {
       }
 
       res.locals.user = user;
+      console.log(user);
       return next();
     }
 
     next();
   } catch (err) {
-    next();
+    return next();
   }
 };
 

@@ -7,7 +7,7 @@ header.header
   nav.nav.nav--user
     if user 
       a.nav__el.nav__el--logout(href="#") Logout
-      a.nav__el
+      a(href="/me").nav__el
         img.nav__user-img(src=`/img/users/${user.photo}` alt="User photo")
         span= user.name
       script(src="/js/logout.js") 
