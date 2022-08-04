@@ -16,7 +16,13 @@ router.route('/updatePassword').post(authController.updatePassword);
 router.route('/updateMe').patch(userController.updateMe);
 router.route('/deleteMe').patch(userController.deleteMe);
 router.route('/updateMePassword').patch(userController.updateMePassword);
-router.route('/updateMeData').patch(userController.updateMe);
+router
+  .route('/updateMeData')
+  .patch(
+    userController.resize,
+    userController.uploadImage,
+    userController.updateMe
+  );
 router.route('/deleteMe').delete(userController.deleteMe);
 router.route('/getMe').get(userController.getMe, userController.getUserById);
 router.route('/logout').post(authController.logout);
