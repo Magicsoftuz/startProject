@@ -19,7 +19,7 @@ const deleteUser = deleteOne(User);
 
 const updateMePassword = catchErrorAsync(async (req, res, next) => {
   // 1) Eski parolni tekshirishib kuramiz
-
+  console.log(req.user);
   if (req.body.oldPassword == req.body.newPassword) {
     return next(
       new AppError('Yangi va eski parollar bir xil bulmasligi kerak!', 404)
@@ -53,8 +53,11 @@ const updateMePassword = catchErrorAsync(async (req, res, next) => {
   await user.save();
 
   // 3) Yangi JWT berish
+  console.log('User:' + user);
 
   const token = authController.createToken(user._id);
+
+  authController.saveTokenCookie(token, res, req);
 
   res.status(200).json({
     status: 'success',

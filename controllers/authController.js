@@ -167,6 +167,7 @@ const isLoggedIn = async (req, res, next) => {
       }
 
       res.locals.user = user;
+      res.user = user;
       console.log(user);
       return next();
     }
@@ -332,4 +333,5 @@ module.exports = {
   updatePassword,
   isLoggedIn,
   logout,
+  saveTokenCookie,
 };
